@@ -69,7 +69,7 @@ print("你的authorization：\n\n"+authorization+"\n\n")
 sckey=input("请进入http://sc.ftqq.com/登录并绑定微信后获取sckey!\n请输入你的server酱的sckey码：\n")
 
 
-week=input("\n\n请输入以下编号开启自动提现到支付宝(其它字符默认不提现):\n[0]不开启自动体现功能\n[1]星期一提现\n[2]星期二提现\n[3]星期三提现\n[4]星期四提现\n[5]星期五提现\n[6]星期六提现\n[7]星期日提现\n")
+week=input("\n\n请输入以下编号开启自动提现到支付宝(其它字符默认不提现):\n[0]不开启自动提现功能\n[1]星期一提现\n[2]星期二提现\n[3]星期三提现\n[4]星期四提现\n[5]星期五提现\n[6]星期六提现\n[7]星期日提现\n")
 weeks=[0,1,2,3,4,5,6,7]
 week=int(week)
 if week not in weeks:
