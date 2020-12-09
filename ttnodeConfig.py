@@ -75,7 +75,7 @@ week=int(week)
 if week not in weeks:
     week=0
 if week!=0:
-    print("\n你已选择在星期:"+str(week)+"提现\n")
+    print("\n你已选择在星期"+str(week)+"自动提现\n")
 else:
     print("\n你已选择不开启自动提现\n")
 
