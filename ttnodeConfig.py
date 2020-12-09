@@ -6,7 +6,6 @@ import datetime as dt
 import time
 import sys
 def getCode(phone):#获取验证码！
-    print(phone)
     url="http://tiantang.mogencloud.com/web/api/login/code"
     body_json="phone="+phone
     encoded_body=body_json.encode('utf-8')
@@ -48,7 +47,7 @@ def getAuthorization(phone,authCode):#获取Authorization
 
 #********************************main******************************************
 path=sys.path[0]
-print("免责声明：\n本程序唯一下载地址：https://www.right.com.cn/forum/thread-4048219-1-1.html 如果你在别的地方下载的，出现问题与作者无关！\n本程序开源，开源自己查阅源码是否有后门。一切个人信息只用于甜糖程序api，请放心使用！，同时禁止转载本相关程序文件！\n禁止使用本程序用于一切商业活动，本程序只供个人学习研究使用。如有侵权请联系作者删除相关内容！\n开源地址：https://github.com/744287383/AutomationTTnode\n")
+print("免责声明：\n本程序唯一下载地址：https://www.right.com.cn/forum/thread-4048219-1-1.html 如果你在别的地方下载的，出现问题与作者无关！\n本程序开源，开源自己查阅源码是否有后门。一切个人信息只用于甜糖程序api，请放心使用！，同时禁止转载本相关程序文件！\n禁止使用本程序用于一切商业活动，本程序只供个人学习研究使用。如有侵权请联系作者删除相关内容！\n")
 stats=input("接受此免责声明：输入1为接受，输入任意字符为不接受,结束程序\n")
 if stats!='1':
 	exit()
@@ -68,9 +67,22 @@ authorization=getAuthorization(phonenum,authCode)
 print("你的authorization：\n\n"+authorization+"\n\n")
 
 sckey=input("请进入http://sc.ftqq.com/登录并绑定微信后获取sckey!\n请输入你的server酱的sckey码：\n")
+
+
+week=input("\n\n请输入以下编号开启自动提现到支付宝(其它字符默认不提现):\n[0]不开启自动体现功能\n[1]星期一提现\n[2]星期二提现\n[3]星期三提现\n[4]星期四提现\n[5]星期五提现\n[6]星期六提现\n[7]星期日提现\n")
+weeks=[0,1,2,3,4,5,6,7]
+week=int(week)
+if week not in weeks:
+    week=0
+if week!=0:
+    print("\n你已选择在星期:"+str(week)+"提现\n")
+else:
+    print("\n你已选择不开启自动提现\n")
+
 config={}
 config["authorization"]=authorization
 config["sckey"]=sckey
+config["week"]=week
 try:
     file=open(path+"/ttnodeConfig.config","w+",encoding="utf-8",errors="ignore")
     file.write(str(config))
