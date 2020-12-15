@@ -57,7 +57,7 @@ if len(phonenum)!=11:
     print("请输入正确的手机号码!!请重新运行")
     exit()
 getCode(phonenum)
-print("验证码发送成功请耐性等待！\n")
+print("验证码发送成功请耐心等待！\n")
 authCode=input("请确保你输入验证码短信是甜糖发的验证码短信，以免造成经济损失，概不负责。\n请输入验证码：\n")
 authCode=str(authCode)
 if len(authCode)!=6:
@@ -69,13 +69,13 @@ print("你的authorization：\n\n"+authorization+"\n\n")
 sckey=input("请进入http://sc.ftqq.com/登录并绑定微信后获取sckey!\n请输入你的server酱的sckey码：\n")
 
 
-week=input("\n\n请输入以下编号开启自动提现到支付宝(其它字符默认不提现):\n[0]不开启自动提现功能\n[1]星期一提现\n[2]星期二提现\n[3]星期三提现\n[4]星期四提现\n[5]星期五提现\n[6]星期六提现\n[7]星期日提现\n")
+week=input("\n\n请输入以下编号开启自动提现到支付宝(其它字符默认不提现):\n[0]不开启自动体现功能\n[1]星期一提现\n[2]星期二提现\n[3]星期三提现\n[4]星期四提现\n[5]星期五提现\n[6]星期六提现\n[7]星期日提现\n")
 weeks=[0,1,2,3,4,5,6,7]
 week=int(week)
 if week not in weeks:
     week=0
 if week!=0:
-    print("\n你已选择在星期"+str(week)+"自动提现\n")
+    print("\n你已选择在星期:"+str(week)+"提现\n")
 else:
     print("\n你已选择不开启自动提现\n")
 

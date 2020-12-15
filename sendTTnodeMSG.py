@@ -138,24 +138,28 @@ def score_logs(device_id,score,name):#收取设备奖励
     return
 
 def sign_in():#签到功能
-    url="http://tiantang.mogencloud.com/web/api/account/sign_in"
-    header={"Content-Type":"application/json","authorization":authorization}
-    http = urllib3.PoolManager()
-    response= http.request('POST', url,headers=header)
-    if response.status!=201 and response.status!=200:
-       print("sign_in方法请求失败，结束程序")
-       exit()
-    data=response.data.decode('utf-8')
-    data=json.loads(data)
-    global msg
-    if data['errCode']!=0:
-        msg=msg+"\n [签到奖励]0-🌟(失败:"+data['msg']+")\n"
-        return
-    msg=msg+"\n [签到奖励]1-🌟 \n"
-    global total
-    total=total+1
-    return
-def readConfig(filePath):
+	url="http://tiantang.mogencloud.com/web/api/account/sign_in"
+	header={"Content-Type":"application/json","authorization":authorization}
+	http = urllib3.PoolManager()
+	response= http.request('POST', url,headers=header)
+	if response.status!=201 and response.status!=200:
+		print("sign_in方法请求失败，结束程序")
+		exit()
+	data=response.data.decode('utf-8')
+	data=json.loads(data)
+	global msg
+
+	if data['errCode']!=0:
+		msg=msg+"\n [签到奖励]0-🌟(失败:"+data['msg']+")\n"
+		return
+
+	msg=msg+"\n [签到奖励]"+str(data['data'])+"-🌟 \n"
+	global total
+	total=total+data['data']
+	return
+
+    
+def readConfig(filePath):#读取配置文件
 	try:
 		file=open(filePath,"a+",encoding="utf-8",errors="ignore")
 		file.seek(0)
@@ -176,7 +180,7 @@ def withdraw_logs(bean):#支付宝提现
     sub_bank_name=""
     type="zfb"
     if score<1000:
-        return "\n####[自动提现]提现失败，星星数不足1000\n"
+        return "\n####[自动提现]提现失败，星愿数不足1000\n"
     body_json="score="+str(score)+"&real_name="+real_name+"&card_id="+card_id+"&bank_name="+bank_name+"&sub_bank_name="+sub_bank_name+"&type="+type
     encoded_body=body_json.encode('utf-8')
     header={"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","authorization":authorization}
@@ -225,19 +229,16 @@ week=int(week)
 
 #*********************************获取用户信息*************************************
 data=getInitInfo()
-time.sleep(1)
 inactivedPromoteScore=data['inactivedPromoteScore']
 accountScore=data['score']
 
 devices=getDevices()#获取设备列表信息
-time.sleep(1)
 #*********************************获取用户信息*************************************
 
 msg=msg+"\n####[收益详细]：\n```python"
 sign_in()#收取签到收益
-time.sleep(1)
 promote_score_logs(inactivedPromoteScore)#收取推广收益
-time.sleep(1)
+
 
 
 for device in devices:
@@ -258,17 +259,17 @@ if week==now_week:
         bean["real_name"]=zfbList[0]['name']
         bean["card_id"]=zfbList[0]['account']
         withdraw=withdraw_logs(bean)
-        time.sleep(1)
 #*********************************收益统计并发送微信消息*************************************
 total_str="\n####[总共收取]"+str(total)+"-🌟\n"
 nowdata=getInitInfo()
 accountScore=nowdata['score']
-accountScore_str="\n####[账户星星]"+str(accountScore)+"-🌟\n"
+nickName="\n####[账户昵称]"+nowdata['nickName']+"\n"
+accountScore_str="\n####[账户星愿]"+str(accountScore)+"-🌟\n"
 
 end="\n```\n***\n注意:以上统计仅供参考，一切请以甜糖客户端APP为准\n填写邀请码123463支持作者！"
 now_time = dt.datetime.now().strftime('%F %T')
 now_time_str="\n***\n####[当前时间]"+now_time+"\n"
-msg=now_time_str+accountScore_str+total_str+withdraw+msg+end
+msg=now_time_str+nickName+accountScore_str+total_str+withdraw+msg+end
 sendServerJiang(msgTitle,msg)
 print("微信消息已推送。请注意查看。")
 exit()
