@@ -179,22 +179,25 @@ def withdraw_logs(bean):#支付宝提现
     bank_name="支付宝"
     sub_bank_name=""
     type="zfb"
+    
     if score<1000:
         return "\n####[自动提现]提现失败，星愿数不足1000\n"
+    
     body_json="score="+str(score)+"&real_name="+real_name+"&card_id="+card_id+"&bank_name="+bank_name+"&sub_bank_name="+sub_bank_name+"&type="+type
     encoded_body=body_json.encode('utf-8')
     header={"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","authorization":authorization}
     http = urllib3.PoolManager()
     response= http.request('POST', url,body=encoded_body,headers=header)
+    response.status=404
     if response.status!=201 and response.status!=200:
-       print("withdraw_logs方法请求失败，结束程序")
-       exit()
+        return "\n####[自动提现]提现失败，请关闭自动提现等待更新并及时查看甜糖客户端app的账目\n"
+       
     data=response.data.decode('utf-8')
     data=json.loads(data)
 
     if data['errCode']!=0:
         print(""+data['msg']+str(score))
-        return "\n####[自动提现]提现失败，请关闭自动提现等待更新\n"
+        return "\n####[自动提现]提现失败，请关闭自动提现等待更新并及时查看甜糖客户端app的账目\n"
 
     data=data['data']
     zfbID=data['card_id']
