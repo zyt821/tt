@@ -1,5 +1,5 @@
 
 30 3 * * * python3 /root/AutomationTTnode/sendTTnodeMSG.py
 
-0 12 * * * cd /root/AutomationTTnode && git reset --hard && git pull
-
+0 12 * * * cd /root/AutomationTTnode && git pull
+10 0 */7 * * rm -f /root/AutomationTTnode/sendTTnodeMSG.log

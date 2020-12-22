@@ -5,6 +5,9 @@ import json
 import datetime as dt
 import time
 import sys
+import logging
+import traceback
+import random
 '''
 特别声明:
 本程序只有甜糖客户端和server酱的相关的api的访问，请仔细查阅程序安全性。
@@ -19,9 +22,21 @@ import sys
 您使用或者复制了本程序且本人制作的任何脚本，则视为已接受此声明，请仔细阅读
 您必须在下载后的24小时内从计算机或手机中完全删除以上内容.
 '''
+def HandleException( excType, excValue, tb):
+	ErrorMessage = traceback.format_exception(excType, excValue, tb)  # 异常信息
+	logging.exception('ErrorMessage: %s' % ErrorMessage)  # 将异常信息记录到日志中
+	str=""
+	for item in ErrorMessage:
+		str=str+item
+	sendServerJiang("[甜糖星愿]程序错误警报","####程序运行错误，请停用程序，手动领取星愿，并联系程序开发者！\n```python\nErrorMessage:%s\n```" %str)
+	return
 
+sys.excepthook = HandleException #全局错误异常处理！
 
-
+path=sys.path[0] #脚本所在目录
+logging.basicConfig(filename=path + '/sendTTnodeMSG.log',format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s', level=logging.DEBUG)
+logging.debug("日志开始")
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 ####################以下内容请不要乱动，程序写得很菜，望大佬手下留情#########################################
 devices=''
 inactivedPromoteScore=0
@@ -38,6 +53,7 @@ def sendServerJiang(text,desp):#发送server酱代码
     response= http.request('POST', url,body=encoded_body,headers=header)
     if response.status!=200:
        print("sendServerJiang方法请求失败，结束程序")
+       logging.debug("sendServerJiang方法请求失败，结束程序")
        exit()
     data=response.data.decode('utf-8')
     data=json.loads(data)
@@ -50,7 +66,8 @@ def getInitInfo():#甜糖用户初始化信息，可以获取待收取的推广�
     response= http.request('POST', url,headers=header)
     if response.status!=200:
        print("getInitInfo方法请求失败，结束程序")
-       exit()
+       logging.debug("getInitInfo方法请求失败，结束程序")
+       raise Exception("响应状态码:"+str(response.status)+"\n请求url:"+url+"\n消息:API出现异常，请暂停使用程序！")
     data=response.data.decode('utf-8')
     data=json.loads(data)
     if data['errCode']!=0:
@@ -68,12 +85,13 @@ def getDevices():#获取当前设备列表，可以获取待收的星星数
     response= http.request('GET', url,headers=header)
     if response.status!=200:
         print("getDevices方法请求失败，结束程序")
-        exit()
+        logging.debug("getDevices方法请求失败，结束程序")
+        raise Exception("响应状态码:"+str(response.status)+"\n请求url:"+url+"\n消息:API出现异常，请暂停使用程序！")
     data=response.data.decode('utf-8')
     data=json.loads(data)
     if data['errCode']!=0:
-       print("发送推送微信，authorization已经失效")
-       exit()
+       raise Exception("响应状态码:"+str(response.status)+"\n请求url:"+url+"\n消息:API可能已经变更，请暂停使用程序！")
+
 
     data=data['data']['data']
     if len(data)==0:
@@ -96,12 +114,13 @@ def promote_score_logs(score):#收取推广奖励星星
     response= http.request('POST', url,body=encoded_body,headers=header)
     if response.status!=201 and response.status!=200:
        print("promote_score_logs方法请求失败，结束程序")
-       exit()
+       logging.debug("promote_score_logs方法请求失败，结束程序")
+       raise Exception("响应状态码:"+str(response.status)+"\n请求url:"+url+"\n消息:API出现异常，请暂停使用程序！")
     data=response.data.decode('utf-8')
     data=json.loads(data)
 
     if data['errCode']!=0:
-        msg=msg+"\n [推广奖励]0-🌟\n"
+        msg=msg+"\n [推广奖励]0-🌟(收取异常)\n"
         return
     msg=msg+"\n [推广奖励]"+str(score)+"-🌟\n"
     global total
@@ -123,12 +142,13 @@ def score_logs(device_id,score,name):#收取设备奖励
     response= http.request('POST', url,body=encoded_body,headers=header)
     if response.status!=201 and response.status!=200:
        print("score_logs方法请求失败，结束程序")
-       exit()
+       logging.debug("score_logs方法请求失败，结束程序")
+       raise Exception("响应状态码:"+str(response.status)+"\n请求url:"+url+"\n消息:API出现异常，请暂停使用程序！")
     data=response.data.decode('utf-8')
     data=json.loads(data)
 
     if data['errCode']!=0:
-        msg=msg+"\n ["+name+"]0-🌟\n"
+        msg=msg+"\n ["+name+"]0-🌟(收取异常)\n"
         return
     msg=msg+"\n ["+name+"]"+str(score)+"-🌟\n"
     global total
@@ -144,7 +164,8 @@ def sign_in():#签到功能
 	response= http.request('POST', url,headers=header)
 	if response.status!=201 and response.status!=200:
 		print("sign_in方法请求失败，结束程序")
-		exit()
+		logging.debug("sign_in方法请求失败，结束程序")
+		raise Exception("响应状态码:"+str(response.status)+"\n请求url:"+url+"\n消息:API出现异常，请暂停使用程序！")
 	data=response.data.decode('utf-8')
 	data=json.loads(data)
 	global msg
@@ -188,8 +209,8 @@ def withdraw_logs(bean):#支付宝提现
     header={"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","authorization":authorization}
     http = urllib3.PoolManager()
     response= http.request('POST', url,body=encoded_body,headers=header)
-    response.status=404
     if response.status!=201 and response.status!=200:
+        logging.debug("withdraw_logs方法请求失败")
         return "\n####[自动提现]提现失败，请关闭自动提现等待更新并及时查看甜糖客户端app的账目\n"
        
     data=response.data.decode('utf-8')
@@ -207,12 +228,12 @@ def withdraw_logs(bean):#支付宝提现
     return "\n####[自动提现]扣除"+str(score)+"-🌟("+zfbID+")\n"
 #*********************************main*************************************
 #*********************************读取配置*************************************
-path=sys.path[0] #脚本所在目录
 config=readConfig(path+"/ttnodeConfig.config")
 print("config:"+config)
 
 if len(config)==0:
 	print("错误提示ttnodeConfig.config为空，请重新运行ttnodeconfig.py")
+	logging.debug("错误提示ttnodeConfig.config为空，请重新运行ttnodeconfig.py")
 	exit()
 
 config=eval(config)#转成字典
@@ -228,7 +249,11 @@ if len(sckey)==0:
 authorization=authorization.strip()
 sckey=sckey.strip()
 week=int(week)
-
+#*********************************错峰延时执行*************************************
+sleep_time=random.randint(1,300)
+print("错峰延时执行"+str(sleep_time)+"秒，请耐心等待")
+logging.debug("错峰延时执行"+str(sleep_time)+"秒，请耐心等待")
+time.sleep(sleep_time)
 
 #*********************************获取用户信息*************************************
 data=getInitInfo()
