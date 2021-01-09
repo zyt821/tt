@@ -28,7 +28,7 @@ def HandleException( excType, excValue, tb):
 	str=""
 	for item in ErrorMessage:
 		str=str+item
-	sendServerJiang("[甜糖星愿]程序错误警报","####程序运行错误，请停用程序，手动领取星愿，并联系程序开发者！\n```python\nErrorMessage:%s\n```" %str)
+	sendServerJiang("[甜糖星愿]程序错误警报","####程序运行错误，请停用程序，手动领取星愿，并联系程序开发者！-三只松鼠\n```python\nErrorMessage:%s\n```" %str)
 	return
 
 sys.excepthook = HandleException #全局错误异常处理！
@@ -72,7 +72,7 @@ def getInitInfo():#甜糖用户初始化信息，可以获取待收取的推广�
     data=json.loads(data)
     if data['errCode']!=0:
         print("发送推送微信，authorization已经失效")
-        sendServerJiang("[甜糖星愿]-Auth失效通知","#### authorization已经失效，请重新抓包填写!\n填写邀请码123463支持作者！\n")
+        sendServerJiang("[甜糖星愿]-Auth失效通知","#### authorization已经失效，请通过手机号码和验证码进行重新生成配置\n \ndocker版：\n```python\ndocker exec -it autottnode /bin/bash -c \"python3 /root/AutomationTTnode/ttnodeConfig.py\" \n```\n源码版：\n```python\npython3 /你的路径/ttnodeConfig.py"+end)
         exit()
     data=data['data']
 
@@ -226,7 +226,7 @@ def withdraw_logs(bean):#支付宝提现
     end=zfbID[7:11]
     zfbID=pre+"***"+end
     return "\n####[自动提现]扣除"+str(score)+"-🌟("+zfbID+")\n"
-#*********************************main*************************************
+#*********************************main***********************************************************************************
 #*********************************读取配置*************************************
 config=readConfig(path+"/ttnodeConfig.config")
 print("config:"+config)
@@ -249,6 +249,7 @@ if len(sckey)==0:
 authorization=authorization.strip()
 sckey=sckey.strip()
 week=int(week)
+end="\n```\n***\n注意:以上统计仅供参考，一切请以甜糖客户端APP为准\n填写邀请码123463支持作者！"
 #*********************************错峰延时执行*************************************
 sleep_time=random.randint(1,300)
 print("错峰延时执行"+str(sleep_time)+"秒，请耐心等待")
@@ -276,6 +277,7 @@ for device in devices:
 withdraw=""
 now_week=dt.datetime.now().isoweekday()#获取今天是星期几返回1-7
 now_week=int(now_week)
+week=0
 if week==now_week:
     userInfo=getInitInfo()
     zfbList=userInfo['zfbList']#获取支付宝列表
@@ -294,10 +296,13 @@ accountScore=nowdata['score']
 nickName="\n####[账户昵称]"+nowdata['nickName']+"\n"
 accountScore_str="\n####[账户星愿]"+str(accountScore)+"-🌟\n"
 
-end="\n```\n***\n注意:以上统计仅供参考，一切请以甜糖客户端APP为准\n填写邀请码123463支持作者！"
+
 now_time = dt.datetime.now().strftime('%F %T')
 now_time_str="\n***\n####[当前时间]"+now_time+"\n"
 msg=now_time_str+nickName+accountScore_str+total_str+withdraw+msg+end
 sendServerJiang(msgTitle,msg)
 print("微信消息已推送。请注意查看。")
+title="[甜糖星愿]特别通知"
+content="####由于甜糖官方更改提现规则，所以暂时关闭自动提现功能，等待作者更新程序！近期甜糖更新改动较大，如有发现程序出现问题，请及时反馈-三只松鼠"
+sendServerJiang(title,content)
 exit()
