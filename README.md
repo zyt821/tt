@@ -21,3 +21,4 @@ armbian：需要自己安装python3和pip和urllib3，百度一般都能找得�
 apt-get update && apt-get install -y python3-pip && pip3 install urllib3       #理论适用于具有apt安装包管理工具的所有linux。需要把系统时间改成和本地一样，不然定时任务时间对不上
 复制代码
 安装好环境了之后，就走上面的教程，上面教程的命令上面的需要把python改成python3
+123
