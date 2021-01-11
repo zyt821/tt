@@ -191,7 +191,7 @@ def readConfig(filePath):#读取配置文件
 			print("文件流已经关闭")
 
 	return result
-def withdraw_logs(bean):#支付宝提现
+def zfb_withdraw(bean):#支付宝提现
     url="http://tiantang.mogencloud.com/api/v1/withdraw_logs"
     score=bean["score"]
     score=score-score%100
@@ -202,8 +202,9 @@ def withdraw_logs(bean):#支付宝提现
     type="zfb"
     
     if score<1000:
-        return "\n####[自动提现]提现失败，星愿数不足1000\n"
-    
+        return "\n####[自动提现]支付宝提现失败，星愿数不足1000\n"
+    if score>10000:
+        score=10000
     body_json="score="+str(score)+"&real_name="+real_name+"&card_id="+card_id+"&bank_name="+bank_name+"&sub_bank_name="+sub_bank_name+"&type="+type
     encoded_body=body_json.encode('utf-8')
     header={"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","authorization":authorization}
@@ -211,21 +212,94 @@ def withdraw_logs(bean):#支付宝提现
     response= http.request('POST', url,body=encoded_body,headers=header)
     if response.status!=201 and response.status!=200:
         logging.debug("withdraw_logs方法请求失败")
-        return "\n####[自动提现]提现失败，请关闭自动提现等待更新并及时查看甜糖客户端app的账目\n"
+        return "\n####[自动提现]支付宝提现失败，请关闭自动提现等待更新并及时查看甜糖客户端app的账目\n"
        
     data=response.data.decode('utf-8')
     data=json.loads(data)
-
+    if data['errCode']==403002:
+        logging.debug("\n####[自动提现]支付宝提现失败，"+data['msg']+"\n")
+        return "\n####[自动提现]支付宝提现失败，"+data['msg']+"\n"
     if data['errCode']!=0:
         print(""+data['msg']+str(score))
-        return "\n####[自动提现]提现失败，请关闭自动提现等待更新并及时查看甜糖客户端app的账目\n"
+        logging.debug(""+data['msg']+str(score))
+        return "\n####[自动提现]支付宝提现失败，请关闭自动提现等待更新并及时查看甜糖客户端app的账目\n"
 
     data=data['data']
     zfbID=data['card_id']
     pre=zfbID[0:4]
-    end=zfbID[7:11]
+    end=zfbID[len(zfbID)-4:len(zfbID)]
     zfbID=pre+"***"+end
-    return "\n####[自动提现]扣除"+str(score)+"-🌟("+zfbID+")\n"
+    return "\n####[自动提现]扣除"+str(score)+"-🌟\n######-------\t提现方式：支付宝\n######-------\t支付宝号："+zfbID+"\n"
+    
+def yhk_withdraw(bean):#银行卡提现
+    url="http://tiantang.mogencloud.com/api/v2/withdraw_logs"
+    score=bean["score"]
+    score=score-score%100
+    real_name=bean["real_name"]
+    card_id=bean["card_id"]
+    bank_name=bean["bank_name"]
+    sub_bank_name=bean["sub_bank_name"]
+    type="bank_card"
+    
+    if score<1000:
+        return "\n####[自动提现]银行卡提现失败，星愿数不足1000\n"
+    body_json="score="+str(score)+"&real_name="+real_name+"&card_id="+card_id+"&bank_name="+bank_name+"&sub_bank_name="+sub_bank_name+"&type="+type
+    encoded_body=body_json.encode('utf-8')
+    header={"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","authorization":authorization}
+    http = urllib3.PoolManager()
+    response= http.request('POST', url,body=encoded_body,headers=header)
+    if response.status!=201 and response.status!=200:
+        logging.debug("withdraw_logs方法请求失败")
+        return "\n####[自动提现]银行卡提现失败，请关闭自动提现等待更新并及时查看甜糖客户端app的账目\n"
+       
+    data=response.data.decode('utf-8')
+    data=json.loads(data)
+    if data['errCode']==403002:
+        logging.debug("\n####[自动提现]银行卡提现失败，"+data['msg']+"\n")
+        return "\n####[自动提现]银行卡提现失败，"+data['msg']+"\n"
+    if data['errCode']!=0:
+        print(""+data['msg']+str(score))
+        logging.debug(""+data['msg']+str(score))
+        return "\n####[自动提现]银行卡提现失败，请关闭自动提现等待更新并及时查看甜糖客户端app的账目\n"
+
+    data=data['data']
+    yhkID=data['card_id']
+    pre=yhkID[0:4]
+    end=yhkID[len(yhkID)-4:len(yhkID)]
+    yhkID=pre+"****"+end
+    return "\n####[自动提现]扣除"+str(score)+"-🌟\n######-------\t提现方式：银行卡\n######-------\t银行卡号："+yhkID+"\n"
+    
+def withdraw_type(userInfo):#根据用户是否签约来决定提现方式
+	isEContract=userInfo['isEContract']
+	bean={}
+	if isEContract:
+		#已经实名签约的采用银行卡提现
+		bankCardList=userInfo['bankCardList']#获取支付宝列表
+		if len(bankCardList)==0:
+			withdraw_str="\n####[自动提现]银行卡提现失败，原因是未绑定银行卡，请绑定一张银行卡\n"
+			return withdraw_str
+		else:
+			bean["score"]=userInfo['score']
+			bean["real_name"]=bankCardList[0]['name']
+			bean["card_id"]=bankCardList[0]['bankCardNum']
+			bean["bank_name"]=bankCardList[0]['bankName']
+			bean["sub_bank_name"]=bankCardList[0]['subBankName']
+			withdraw_str=yhk_withdraw(bean)
+			return withdraw_str
+	else:
+		#未实名签约采用支付宝提现
+		zfbList=userInfo['zfbList']#获取支付宝列表
+		if len(zfbList)==0:
+			withdraw_str="\n####[自动提现]支付提现失败，原因是未绑定支付宝号，请绑定支付宝账户\n"
+			return withdraw_str
+		else:
+			bean["score"]=userInfo['score']
+			bean["real_name"]=zfbList[0]['name']
+			bean["card_id"]=zfbList[0]['account']
+			withdraw_str=zfb_withdraw(bean)
+			return withdraw_str
+
+	
 #*********************************main***********************************************************************************
 #*********************************读取配置*************************************
 config=readConfig(path+"/ttnodeConfig.config")
@@ -277,18 +351,11 @@ for device in devices:
 withdraw=""
 now_week=dt.datetime.now().isoweekday()#获取今天是星期几返回1-7
 now_week=int(now_week)
-week=0
+
 if week==now_week:
     userInfo=getInitInfo()
-    zfbList=userInfo['zfbList']#获取支付宝列表
-    if len(zfbList)==0:
-        withdraw="\n####[自动提现]提现失败，请绑定支付宝账户\n"
-    else:
-        bean={}
-        bean["score"]=userInfo['score']
-        bean["real_name"]=zfbList[0]['name']
-        bean["card_id"]=zfbList[0]['account']
-        withdraw=withdraw_logs(bean)
+    withdraw=withdraw_type(userInfo)
+      
 #*********************************收益统计并发送微信消息*************************************
 total_str="\n####[总共收取]"+str(total)+"-🌟\n"
 nowdata=getInitInfo()
@@ -302,7 +369,7 @@ now_time_str="\n***\n####[当前时间]"+now_time+"\n"
 msg=now_time_str+nickName+accountScore_str+total_str+withdraw+msg+end
 sendServerJiang(msgTitle,msg)
 print("微信消息已推送。请注意查看。")
-title="[甜糖星愿]特别通知"
-content="####由于甜糖官方更改提现规则，所以暂时关闭自动提现功能，等待作者更新程序！近期甜糖更新改动较大，如有发现程序出现问题，请及时反馈-三只松鼠"
+title="[甜糖星愿]再次开放自动提现功能"
+content="####提现功能已更新,已开放提现功能。\n####提现策略：如果已经实名签约的统一采用银行卡提现；未实名签约的同一采用支付宝提现，支付宝提现最大金额100￥，当账户金额大于100￥时默认提现100￥；一周只能提现一次！\n####近期甜糖更新改动较大，如有发现程序出现问题，请及时反馈-三只松鼠\n本消息推送会提醒3日，3日后会自动关闭！"
 sendServerJiang(title,content)
 exit()
