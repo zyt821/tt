@@ -217,8 +217,8 @@ def zfb_withdraw(bean):#支付宝提现
     
     if score<1000:
         return "\n####[自动提现]支付宝提现失败，星愿数不足1000\n"
-    if score>10000:
-        score=10000
+    if score>=10000:
+        score=9900
     body_json="score="+str(score)+"&real_name="+real_name+"&card_id="+card_id+"&bank_name="+bank_name+"&sub_bank_name="+sub_bank_name+"&type="+type
     encoded_body=body_json.encode('utf-8')
     header={"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8","authorization":authorization}
