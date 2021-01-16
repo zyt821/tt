@@ -386,5 +386,5 @@ sendServerJiang(msgTitle,msg)
 print("微信消息已推送。请注意查看。")
 title="[甜糖星愿]再次开放自动提现功能"
 content="####提现功能已更新,已开放提现功能。\n####提现策略：如果已经实名签约的统一采用银行卡提现；未实名签约的同一采用支付宝提现，支付宝提现最大金额99￥，当账户金额大于等于100￥时默认提现99￥；一周只能提现一次！\n####近期甜糖更新改动较大，如有发现程序出现问题，请及时反馈-三只松鼠\n本消息推送会提醒3日，3日后会自动关闭！"
-sendServerJiang(title,content)
+#sendServerJiang(title,content)
 exit()
