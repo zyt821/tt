@@ -59,19 +59,6 @@ def sendServerJiang(text,desp):#发送server酱代码
     data=json.loads(data)
     return
 
-def user_props_actived():#疑似延长auth有效时间
-    url="http://tiantang.mogencloud.com/api/v1/user_props/actived"
-    header={"Content-Type":"application/json","authorization":authorization}
-    http = urllib3.PoolManager()
-    response= http.request('GET', url,headers=header)
-    if response.status!=200:
-        print("getDevices方法请求失败，结束程序")
-        logging.debug("getDevices方法请求失败，结束程序")
-        raise Exception("响应状态码:"+str(response.status)+"\n请求url:"+url+"\n消息:API出现异常，请暂停使用程序！")
-    data=response.data.decode('utf-8')
-    data=json.loads(data)
-    if data['errCode']!=0:
-       raise Exception("响应状态码:"+str(response.status)+"\n请求url:"+url+"\n消息:API可能已经变更，请暂停使用程序！")
 
 def getInitInfo():#甜糖用户初始化信息，可以获取待收取的推广信息数，可以获取账户星星数
     url="http://tiantang.mogencloud.com/web/api/account/message/loading"
@@ -345,7 +332,6 @@ logging.debug("错峰延时执行"+str(sleep_time)+"秒，请耐心等待")
 time.sleep(sleep_time)
 
 #*********************************获取用户信息*************************************
-user_props_actived()
 data=getInitInfo()
 inactivedPromoteScore=data['inactivedPromoteScore']
 accountScore=data['score']
