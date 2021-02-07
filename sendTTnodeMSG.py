@@ -370,7 +370,7 @@ now_time_str="\n***\n####[当前时间]"+now_time+"\n"
 msg=now_time_str+nickName+accountScore_str+total_str+withdraw+msg+end
 sendServerJiang(msgTitle,msg)
 print("微信消息已推送。请注意查看。")
-title="[甜糖星愿]再次开放自动提现功能"
-content="####提现功能已更新,已开放提现功能。\n####提现策略：如果已经实名签约的统一采用银行卡提现；未实名签约的同一采用支付宝提现，支付宝提现最大金额99￥，当账户金额大于等于100￥时默认提现99￥；一周只能提现一次！\n####近期甜糖更新改动较大，如有发现程序出现问题，请及时反馈-三只松鼠\n本消息推送会提醒3日，3日后会自动关闭！"
-#sendServerJiang(title,content)
+title="[甜糖星愿]特别通知"
+content="####由于甜糖放假关闭提现功能直到18号才开放，所以暂时关闭自动提现功能！由于甜糖结算时间越来越长，导致3点半推广奖励仍然没有结算完，故修改脚本运行时间6点半执行！\n提示：本消息提醒3次！"
+sendServerJiang(title,content)
 exit()
