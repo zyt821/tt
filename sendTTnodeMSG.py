@@ -352,7 +352,7 @@ for device in devices:
 withdraw=""
 now_week=dt.datetime.now().isoweekday()#获取今天是星期几返回1-7
 now_week=int(now_week)
-now_week=0
+week=0
 if week==now_week:
     userInfo=getInitInfo()
     withdraw=withdraw_type(userInfo)
