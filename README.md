@@ -7,8 +7,8 @@
 \n有推送证明已经成功了。
 
 op的请把下面的定时规则添加到计划任务。其它armbian或其它linux的请运行crontab -e 把下面的规则添加进去。
-\n15 1 * * *的意思是每天的1点15分执行这个命令，可以自行修改时间。
-\n15 1 * * * python /root/sendTTnodeMSG.py
+30 6 * * *的意思是每天的6点30分执行这个命令，可以自行修改时间。
+30 6 * * * python /root/sendTTnodeMSG.py
 
 以上命令由于环境不一样，命令不一样，如果提示python 命令找不到的，请把上面命令中的python改成python3
 
