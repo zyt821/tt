@@ -370,7 +370,7 @@ now_time_str="\n***\n####[当前时间]"+now_time+"\n"
 msg=now_time_str+nickName+accountScore_str+total_str+withdraw+msg+end
 sendServerJiang(msgTitle,msg)
 print("微信消息已推送。请注意查看。")
-title="[甜糖星愿]特别通知"
-content="####由于甜糖放假关闭提现功能直到18号才开放，所以暂时关闭自动提现功能！由于甜糖结算时间越来越长，导致3点半推广奖励仍然没有结算完，故修改脚本运行时间6点半执行！\n提示：本消息提醒3次！"
-sendServerJiang(title,content)
+title="[甜糖星愿]"
+content="####"
+#sendServerJiang(title,content)
 exit()
